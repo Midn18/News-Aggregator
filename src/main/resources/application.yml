@@ -1,0 +1,12 @@
+server:
+  port: 8080
+
+api:
+  news-service:
+    base-url: "https://api.thenewsapi.com/v1/news"
+    key: "KwlNmjWcKwAZ17ONCGIoNuVN7WVTOllajPaFWqoo"
+
+logging:
+  level:
+    root: "INFO"
+    org.springframework.web: "DEBUG"
