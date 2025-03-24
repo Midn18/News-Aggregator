@@ -1,6 +1,6 @@
-package com.example.news_aggregator_project.controller
+package com.example.newsAggregator.controller
 
-import com.example.news_aggregator_project.service.AllNewsService
+import com.example.newsAggregator.service.AllNewsService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController

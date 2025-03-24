@@ -1,6 +1,6 @@
-package com.example.news_aggregator_project.service
+package com.example.newsAggregator.service
 
-import com.example.news_aggregator_project.config.NewsApiProperties
+import com.example.newsAggregator.config.NewsApiProperties
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -12,9 +12,10 @@ class AllNewsService(
     private val newsApiProperties: NewsApiProperties
 ) {
     private val logger: Logger = LoggerFactory.getLogger(AllNewsService::class.java)
+    private val url: String =
+        "${newsApiProperties.baseUrl}/headlines?locale=us&language=en&api_token=${newsApiProperties.key}"
 
     fun getAllNews(): String? {
-        val url = "${newsApiProperties.baseUrl}/all/?api_token=${newsApiProperties.key}&limit=10"
         logger.info("Retrieving all news from: $url")
 
         return try {
@@ -23,7 +24,7 @@ class AllNewsService(
             response
         } catch (e: Exception) {
             logger.error("Error fetching news: ${e.message}", e)
-            "Error fetching news: ${e.message}"
+            "Unexpected error occurred, please try again"
         }
     }
 }

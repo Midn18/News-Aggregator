@@ -1,4 +1,4 @@
-package com.example.news_aggregator_project
+package com.example.newsAggregator
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

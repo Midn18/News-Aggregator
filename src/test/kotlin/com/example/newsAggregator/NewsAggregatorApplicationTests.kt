@@ -1,4 +1,4 @@
-package com.example.news_aggregator_project
+package com.example.newsAggregator
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest

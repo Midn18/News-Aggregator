@@ -1,4 +1,4 @@
-package com.example.news_aggregator_project.config
+package com.example.newsAggregator.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
