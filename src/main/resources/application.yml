@@ -1,6 +1,14 @@
 server:
   port: 8080
 
+spring:
+  data:
+    mongodb:
+      username: "danilencomihailamdaris"
+      password: "PRAu3NUXG73PXPLK"
+      uri: "mongodb+srv://${spring.data.mongodb.username}:${spring.data.mongodb.password}@newsaggregator.iahqf.mongodb.net/?retryWrites=true&w=majority&appName=NewsAggregator"
+      database: "news_db"
+
 api:
   news-service:
     base-url: "https://api.thenewsapi.com/v1/news"
