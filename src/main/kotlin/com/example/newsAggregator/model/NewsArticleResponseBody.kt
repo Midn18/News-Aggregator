@@ -1,6 +1,6 @@
-import com.example.newsAggregator.entity.NewsArticleDB
+import com.example.newsAggregator.model.NewsArticle
 
 data class NewsArticleResponseBody(
-    val newsArticle: List<NewsArticleDB>,
-    val pageSizeLimit: Int
+    val newsArticle: List<NewsArticle>,
+    val pageSizeLimit: Int?
 )

@@ -1,8 +1,7 @@
 package com.example.newsAggregator.controller
 
 import NewsArticleResponseBody
-import com.example.newsAggregator.entity.NewsArticleDB
-import com.example.newsAggregator.entity.SourceDB
+import com.example.newsAggregator.model.Source
 import com.example.newsAggregator.service.NewsService
 import com.example.newsAggregator.service.SourceService
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,25 +16,16 @@ class NewsController(
     private val sourceService: SourceService
 ) {
 
-    @GetMapping("/all")
-    fun getAllNews(): List<NewsArticleDB>? {
-        return newsService.getAllNews()
-    }
-
-    @GetMapping("/allNewsByParams")
-    fun getNewsByParams(
-        @RequestParam(name = "page_size") limit: Int
+    @GetMapping("/article")
+    fun getNewsArticle(
+        @RequestParam(name = "page_size", defaultValue = "3", required = false) limit: Int?,
+        @RequestParam(name = "language", defaultValue = "en", required = false) language: String?
     ): NewsArticleResponseBody? {
-        return newsService.getAllNewsByParams(limit)
+        return newsService.getAllNewsByParams(limit, language)
     }
 
-    @GetMapping("/allNewsFromDb")
-    fun getAllNewsFromDb(): List<NewsArticleDB>? {
-        return newsService.getAllNewsFromDb()
-    }
-
-    @GetMapping("/sources")
-    fun getAllSources(): List<SourceDB>? {
+    @GetMapping("/source")
+    fun getAllSources(): List<Source>? {
         return sourceService.getAllSources()
     }
 }
