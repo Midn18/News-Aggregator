@@ -1,11 +1,15 @@
 package com.example.newsAggregator.service
 
 import com.example.newsAggregator.config.NewsApiProperties
+import com.example.newsAggregator.model.NewsArticle
 import com.example.newsAggregator.model.Source
 import com.example.newsAggregator.repository.SourceRepository
 import com.example.newsAggregator.utils.GetSourceResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 
@@ -13,7 +17,8 @@ import org.springframework.web.client.RestTemplate
 class SourceService(
     private val restTemplate: RestTemplate,
     newsApiProperties: NewsApiProperties,
-    private val sourceRepository: SourceRepository
+    private val sourceRepository: SourceRepository,
+    private val mongoTemplate: MongoTemplate
 ) {
     private val logger: Logger = LoggerFactory.getLogger(NewsService::class.java)
     private val url: String =
@@ -27,7 +32,7 @@ class SourceService(
         logger.info("Response from API: $response")
 
         return try {
-            val filteredSources = verifyExistingSourcesInDb(response.data)
+            val filteredSources = filterNewSources(response.data)
             sourceRepository.saveAll(filteredSources)
 
             filteredSources
@@ -37,10 +42,13 @@ class SourceService(
         }
     }
 
-    private fun verifyExistingSourcesInDb(sourcesList: List<Source>): List<Source> {
-        val existingSources = sourceRepository.findAll()
-        val existingSourcesIds = existingSources.map { it.sourceId }
+    private fun filterNewSources(sourcesList: List<Source>): List<Source> {
+        val newIds = sourcesList.map { it.sourceId }
+        val query = Query(Criteria.where("_id").`in`(newIds))
+        val existingSources: Set<String> = mongoTemplate.find(query, Source::class.java)
+            .map { it.sourceId }
+            .toSet()
 
-        return sourcesList.filter { !existingSourcesIds.contains(it.sourceId) }
+        return sourcesList.filter { it.sourceId !in existingSources }
     }
 }

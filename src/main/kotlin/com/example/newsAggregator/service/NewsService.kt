@@ -7,6 +7,9 @@ import com.example.newsAggregator.repository.NewsArticleRepository
 import com.example.newsAggregator.utils.GetNewsArticlesResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 
@@ -14,7 +17,8 @@ import org.springframework.web.client.RestTemplate
 class NewsService(
     private val restTemplate: RestTemplate,
     newsApiProperties: NewsApiProperties,
-    private val newsArticleRepository: NewsArticleRepository
+    private val newsArticleRepository: NewsArticleRepository,
+    private val mongoTemplate: MongoTemplate
 ) {
     private val logger: Logger = LoggerFactory.getLogger(NewsService::class.java)
     private val url: String =
@@ -33,7 +37,7 @@ class NewsService(
         logger.info("Response from API: $response")
 
         return try {
-            val filteredNews = verifyExistingNewsInDb(response.data)
+            val filteredNews = filterNewNewsArticles(response.data)
 
             newsArticleRepository.saveAll(filteredNews)
 
@@ -44,9 +48,14 @@ class NewsService(
         }
     }
 
-    private fun verifyExistingNewsInDb(newsList: List<NewsArticle>): List<NewsArticle> {
-        val existingNews = newsArticleRepository.findAll()
-        val existingNewsUuids = existingNews.map { it.uuid }
+    private fun filterNewNewsArticles(newsList: List<NewsArticle>): List<NewsArticle> {
+        val newIds = newsList.map { it.uuid }
+
+        val query = Query(Criteria.where("_id").`in`(newIds))
+        val existingNewsUuids: Set<String> = mongoTemplate.find(query, NewsArticle::class.java)
+            .map { it.uuid }
+            .toSet()
+
         return newsList.filter { it.uuid !in existingNewsUuids }
     }
 }
