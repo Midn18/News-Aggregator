@@ -10,9 +10,13 @@ spring:
       database: "news_db"
 
 api:
-  news-service:
+  news-api:
     base-url: "https://api.thenewsapi.com/v1/news"
     key: "KwlNmjWcKwAZ17ONCGIoNuVN7WVTOllajPaFWqoo"
+
+scheduler:
+  cron:
+    news-fetcher: "0 */3 * * * ?"
 
 logging:
   level:

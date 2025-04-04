@@ -1,7 +1,6 @@
-package com.example.newsAggregator.service
+package com.example.newsAggregator.services
 
 import com.example.newsAggregator.config.NewsApiProperties
-import com.example.newsAggregator.model.NewsArticle
 import com.example.newsAggregator.model.Source
 import com.example.newsAggregator.repository.SourceRepository
 import com.example.newsAggregator.utils.GetSourceResponse
