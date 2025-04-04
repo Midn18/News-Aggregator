@@ -4,8 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
 @Component
-@ConfigurationProperties(prefix = "api.news-api")
-class NewsApiProperties {
-    lateinit var baseUrl: String
-    lateinit var key: String
+@ConfigurationProperties(prefix = "scheduler.cron")
+class SchedulerProperties {
+    lateinit var newsFetcher: String
 }

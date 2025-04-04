@@ -1,51 +1,46 @@
-package com.example.newsAggregator.service
+package com.example.newsAggregator.services
 
 import NewsArticleResponseBody
-import com.example.newsAggregator.config.NewsApiProperties
+import com.example.newsAggregator.clients.NewsApiClient
 import com.example.newsAggregator.model.NewsArticle
 import com.example.newsAggregator.repository.NewsArticleRepository
-import com.example.newsAggregator.utils.GetNewsArticlesResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Service
-import org.springframework.web.client.RestTemplate
 
 @Service
 class NewsService(
-    private val restTemplate: RestTemplate,
-    newsApiProperties: NewsApiProperties,
+    private val newsApiClient: NewsApiClient,
     private val newsArticleRepository: NewsArticleRepository,
     private val mongoTemplate: MongoTemplate
 ) {
     private val logger: Logger = LoggerFactory.getLogger(NewsService::class.java)
-    private val url: String =
-        "${newsApiProperties.baseUrl}/all?api_token=${newsApiProperties.key}"
 
     fun getAllNewsByParams(pageSize: Int?, language: String?): NewsArticleResponseBody {
-        val urlWithParams = "$url&limit=$pageSize&language=$language"
-        logger.info("Retrieving news from: $urlWithParams")
-
-        val response: GetNewsArticlesResponse =
-            restTemplate.getForObject(urlWithParams, GetNewsArticlesResponse::class.java)
-                ?: return NewsArticleResponseBody(
-                    emptyList(),
-                    pageSize
-                )
+        val response = newsApiClient.getAllNewsByParams(pageSize, language)
         logger.info("Response from API: $response")
-
         return try {
-            val filteredNews = filterNewNewsArticles(response.data)
+            val filteredNews = filterNewNewsArticles(response?.data ?: emptyList())
 
             newsArticleRepository.saveAll(filteredNews)
 
-            NewsArticleResponseBody(filteredNews, pageSize)
+            NewsArticleResponseBody(filteredNews, pageSize ?: 0)
         } catch (e: Exception) {
             logger.error("Error parsing news response: ${e.message}", e)
-            NewsArticleResponseBody(emptyList(), pageSize)
+            NewsArticleResponseBody(emptyList(), pageSize ?: 0)
         }
+    }
+
+    fun getNewsByPageNumber(pageNumber: Int): List<NewsArticle> {
+        if (pageNumber !in 1..10)
+            throw IllegalArgumentException("Page number must be between 1 and 10")
+        val pageRequest = PageRequest.of(pageNumber - 1, 10)
+        val newsArticles = newsArticleRepository.findAllByPageNumber(pageRequest)
+        return newsArticles.content
     }
 
     private fun filterNewNewsArticles(newsList: List<NewsArticle>): List<NewsArticle> {
