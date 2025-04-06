@@ -27,9 +27,9 @@ class NewsController(
 
     @GetMapping("/article/page")
     fun getNewsArticleByPageNumber(
-        @RequestParam(name = "page_number", defaultValue = "1", required = true) pageNumber: Int?,
-    ): List<NewsArticle>? {
-        return pageNumber?.let { newsService.getNewsByPageNumber(it) }
+        @RequestParam(name = "page_number", defaultValue = "1", required = true) pageNumber: Int,
+    ): List<NewsArticle> {
+        return pageNumber.let { newsService.getNewsByPageNumber(it) }
     }
 
     @GetMapping("/source")

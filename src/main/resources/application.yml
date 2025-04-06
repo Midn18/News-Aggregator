@@ -16,7 +16,7 @@ api:
 
 scheduler:
   cron:
-    news-fetcher: "0 */3 * * * ?"
+    news-fetcher: "1 * * * * ?"
 
 logging:
   level:

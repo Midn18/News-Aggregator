@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Service
@@ -22,16 +23,33 @@ class NewsService(
 
     fun getAllNewsByParams(pageSize: Int?, language: String?): NewsArticleResponseBody {
         val response = newsApiClient.getAllNewsByParams(pageSize, language)
-        logger.info("Response from API: $response")
         return try {
             val filteredNews = filterNewNewsArticles(response?.data ?: emptyList())
 
             newsArticleRepository.saveAll(filteredNews)
-
             NewsArticleResponseBody(filteredNews, pageSize ?: 0)
         } catch (e: Exception) {
             logger.error("Error parsing news response: ${e.message}", e)
             NewsArticleResponseBody(emptyList(), pageSize ?: 0)
+        }
+    }
+
+    @Scheduled(cron = "#{schedulerProperties.newsFetcher}")
+    fun fetchAndSaveNewsPeriodically() {
+        try {
+            val response = newsApiClient.getNewsArticleScheduledJob(3, "ro")
+            val newsList = response?.data ?: emptyList()
+
+            val filtered = filterNewNewsArticles(newsList)
+
+            if (filtered.isNotEmpty()) {
+                newsArticleRepository.saveAll(filtered)
+                logger.info("Saved ${filtered.size} new articles.")
+            } else {
+                logger.info("No new articles to save.")
+            }
+        } catch (e: Exception) {
+            logger.error("Error fetching/saving news: ${e.message}", e)
         }
     }
 
