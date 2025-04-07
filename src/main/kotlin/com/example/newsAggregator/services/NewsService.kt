@@ -1,6 +1,5 @@
 package com.example.newsAggregator.services
 
-import NewsArticleResponseBody
 import com.example.newsAggregator.clients.NewsApiClient
 import com.example.newsAggregator.model.NewsArticle
 import com.example.newsAggregator.repository.NewsArticleRepository
@@ -21,23 +20,10 @@ class NewsService(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(NewsService::class.java)
 
-    fun getAllNewsByParams(pageSize: Int?, language: String?): NewsArticleResponseBody {
-        val response = newsApiClient.getAllNewsByParams(pageSize, language)
-        return try {
-            val filteredNews = filterNewNewsArticles(response?.data ?: emptyList())
-
-            newsArticleRepository.saveAll(filteredNews)
-            NewsArticleResponseBody(filteredNews, pageSize ?: 0)
-        } catch (e: Exception) {
-            logger.error("Error parsing news response: ${e.message}", e)
-            NewsArticleResponseBody(emptyList(), pageSize ?: 0)
-        }
-    }
-
-    @Scheduled(cron = "#{schedulerProperties.newsFetcher}")
-    fun fetchAndSaveNewsPeriodically() {
+    @Scheduled(cron = "\${scheduler.cron.news-fetcher}")
+    fun getNewsArticles() {
         try {
-            val response = newsApiClient.getNewsArticleScheduledJob(3, "ro")
+            val response = newsApiClient.getNewsArticles(3, "ro")
             val newsList = response?.data ?: emptyList()
 
             val filtered = filterNewNewsArticles(newsList)

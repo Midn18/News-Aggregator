@@ -1,3 +1,5 @@
+package com.example.newsAggregator.config
+
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.HttpRequest
@@ -19,8 +21,9 @@ class LoggingInterceptor : ClientHttpRequestInterceptor {
         val response = execution.execute(request, body)
         val responseBody = response.body.bufferedReader().readText()
 
-        logger.info("Response status: ${response.statusCode}")
-        logger.info("Response body: $responseBody")
+        if (logger.isInfoEnabled) {
+            logger.info("Response status: ${response.statusCode} and body: $responseBody")
+        }
 
         return response
     }

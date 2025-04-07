@@ -1,6 +1,5 @@
 package com.example.newsAggregator.controller
 
-import NewsArticleResponseBody
 import com.example.newsAggregator.model.NewsArticle
 import com.example.newsAggregator.model.Source
 import com.example.newsAggregator.services.NewsService
@@ -16,14 +15,6 @@ class NewsController(
     private val newsService: NewsService,
     private val sourceService: SourceService
 ) {
-
-    @GetMapping("/article")
-    fun getNewsArticle(
-        @RequestParam(name = "page_size", defaultValue = "3", required = false) limit: Int?,
-        @RequestParam(name = "language", defaultValue = "en", required = false) language: String?
-    ): NewsArticleResponseBody? {
-        return newsService.getAllNewsByParams(limit, language)
-    }
 
     @GetMapping("/article/page")
     fun getNewsArticleByPageNumber(
