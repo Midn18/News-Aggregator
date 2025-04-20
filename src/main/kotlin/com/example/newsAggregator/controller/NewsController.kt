@@ -1,12 +1,12 @@
 package com.example.newsAggregator.controller
 
-import com.example.newsAggregator.model.NewsArticle
 import com.example.newsAggregator.model.Source
 import com.example.newsAggregator.services.NewsService
 import com.example.newsAggregator.services.SourceService
 import com.example.newsAggregator.utils.NewsCategoryEnum
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
+import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -32,17 +32,19 @@ class NewsController(
         pageSize: Int?,
         @RequestParam(name = "category", required = false) category: String?,
         @RequestParam(name = "search", required = false) search: String?,
-    ): List<NewsArticle> {
+    ): ResponseEntity<out Any> {
         val categoryEnum = NewsCategoryEnum.from(category)
         if (category != null && categoryEnum == null) {
             throw IllegalArgumentException("Invalid category: $category")
         }
 
-        return newsService.getNewsByParams(
-            pageNumber = pageNumber ?: 1,
-            pageSize = pageSize ?: 10,
-            categoryEnum?.value,
-            search
+        return ResponseEntity.ok(
+            newsService.getNewsByParams(
+                pageNumber = pageNumber ?: 1,
+                pageSize = pageSize ?: 10,
+                categoryEnum?.value,
+                search
+            )
         )
     }
 
