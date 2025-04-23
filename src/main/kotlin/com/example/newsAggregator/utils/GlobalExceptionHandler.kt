@@ -3,8 +3,11 @@ package com.example.newsAggregator.utils
 import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 
 @ControllerAdvice
 class GlobalExceptionHandler {
@@ -20,22 +23,22 @@ class GlobalExceptionHandler {
         return ResponseEntity(ex.message ?: "Invalid request", HttpStatus.BAD_REQUEST)
     }
 
-    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException::class)
-    fun handleInvalidArgument(ex: org.springframework.web.bind.MethodArgumentNotValidException): ResponseEntity<String> {
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleInvalidArgument(ex: MethodArgumentNotValidException): ResponseEntity<String> {
         val message = ex.bindingResult.allErrors.joinToString("; ") { it.defaultMessage ?: "Invalid value" }
         return ResponseEntity(message, HttpStatus.BAD_REQUEST)
     }
 
-    @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException::class)
-    fun handleTypeMismatch(ex: org.springframework.web.method.annotation.MethodArgumentTypeMismatchException): ResponseEntity<String> {
+    @ExceptionHandler(MethodArgumentTypeMismatchException::class)
+    fun handleTypeMismatch(ex: MethodArgumentTypeMismatchException): ResponseEntity<String> {
         return ResponseEntity(
             "Invalid type for parameter '${ex.name}': expected ${ex.requiredType?.simpleName}",
             HttpStatus.BAD_REQUEST
         )
     }
 
-    @ExceptionHandler(org.springframework.web.bind.MissingServletRequestParameterException::class)
-    fun handleMissingParam(ex: org.springframework.web.bind.MissingServletRequestParameterException): ResponseEntity<String> {
+    @ExceptionHandler(MissingServletRequestParameterException::class)
+    fun handleMissingParam(ex: MissingServletRequestParameterException): ResponseEntity<String> {
         return ResponseEntity("Missing request parameter: ${ex.parameterName}", HttpStatus.BAD_REQUEST)
     }
 
