@@ -39,12 +39,18 @@ class NewsService(
         }
     }
 
-    fun getNewsByPageNumber(pageNumber: Int): List<NewsArticle> {
-        if (pageNumber !in 1..10)
-            throw IllegalArgumentException("Page number must be between 1 and 10")
-        val pageRequest = PageRequest.of(pageNumber - 1, 10)
-        val newsArticles = newsArticleRepository.findAllByPageNumber(pageRequest)
-        return newsArticles.content
+    fun getNewsByParams(pageNumber: Int, pageSize: Int, category: String?, search: String?): List<NewsArticle> {
+        if (pageNumber < 1) {
+            throw IllegalArgumentException("Page number must be greater than 0")
+        }
+
+        val pageRequest = PageRequest.of(pageNumber - 1, pageSize)
+        val news = newsArticleRepository.findAllNewsByParams(
+            pageRequest,
+            category ?: "",
+            search ?: ""
+        )
+        return news.content
     }
 
     private fun filterNewNewsArticles(newsList: List<NewsArticle>): List<NewsArticle> {
