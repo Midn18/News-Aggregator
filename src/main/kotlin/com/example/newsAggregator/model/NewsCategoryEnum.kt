@@ -1,4 +1,4 @@
-package com.example.newsAggregator.utils
+package com.example.newsAggregator.model
 
 enum class NewsCategoryEnum(val value: String) {
     GENERAL("general"),

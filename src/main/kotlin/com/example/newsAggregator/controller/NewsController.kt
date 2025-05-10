@@ -1,9 +1,10 @@
 package com.example.newsAggregator.controller
 
+import com.example.newsAggregator.exceptions.InvalidSingleFieldException
 import com.example.newsAggregator.model.Source
 import com.example.newsAggregator.services.NewsService
 import com.example.newsAggregator.services.SourceService
-import com.example.newsAggregator.utils.NewsCategoryEnum
+import com.example.newsAggregator.model.NewsCategoryEnum
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import org.springframework.http.ResponseEntity
@@ -35,7 +36,7 @@ class NewsController(
     ): ResponseEntity<out Any> {
         val categoryEnum = NewsCategoryEnum.from(category)
         if (category != null && categoryEnum == null) {
-            throw IllegalArgumentException("Invalid category: $category")
+            throw InvalidSingleFieldException("category", "Invalid category")
         }
 
         return ResponseEntity.ok(

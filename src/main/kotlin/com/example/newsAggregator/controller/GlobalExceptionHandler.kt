@@ -1,4 +1,4 @@
-package com.example.newsAggregator.utils
+package com.example.newsAggregator.controller
 
 import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpStatus
